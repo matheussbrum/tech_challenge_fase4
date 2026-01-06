@@ -9,10 +9,8 @@ def download_data():
     logger.info("Downloading data from Yahoo Finance")
     df = yf.download(SYMBOL, start=START_DATE, end=END_DATE)
 
-        # Remove as duas primeiras linhas
     df = df.iloc[2:]
 
-    # Flatten columns se tiver multi-index
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 

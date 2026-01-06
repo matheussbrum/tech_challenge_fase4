@@ -1,6 +1,5 @@
 import pandas as pd
 import joblib
-import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from src.utils.config import DATA_RAW_DIR, DATA_PROCESSED_DIR, SYMBOL, MODELS_DIR
 from src.utils.logger import get_logger
@@ -12,32 +11,26 @@ def preprocess_data():
 
     df = pd.read_csv(DATA_RAW_DIR / f"{SYMBOL}.csv", index_col=0)
 
+    # Garante que a coluna Close existe
     if "Close" not in df.columns:
         raise ValueError("Column 'Close' not found in dataset")
 
+    # Seleciona apenas Close e força conversão numérica
     df = df[["Close"]]
     df["Close"] = pd.to_numeric(df["Close"], errors="coerce")
+
+    # Remove valores inválidos
     df = df.dropna()
 
     scaler = MinMaxScaler()
-    scaled = scaler.fit_transform(df[["Close"]].values)
-
-    WINDOW_SIZE = 30
-
-    def create_sequences(data, window):
-        X, y = [], []
-        for i in range(window, len(data)):
-            X.append(data[i-window:i])
-            y.append(data[i])
-        return np.array(X), np.array(y)
-
-    X, y = create_sequences(scaled, WINDOW_SIZE)
+    scaled = scaler.fit_transform(df.values)
 
     DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-    np.save(DATA_PROCESSED_DIR / "X.npy", X)
-    np.save(DATA_PROCESSED_DIR / "y.npy", y)
+    pd.DataFrame(scaled, columns=["Close"]).to_csv(
+        DATA_PROCESSED_DIR / "scaled_data.csv", index=False
+    )
 
     joblib.dump(scaler, MODELS_DIR / "scaler.pkl")
 
