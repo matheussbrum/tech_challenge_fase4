@@ -1,8 +1,11 @@
 from pydantic import BaseModel
-from typing import List
+from datetime import date
 
 class PredictionRequest(BaseModel):
-    prices: List[float]
+    symbol: str
+    start_date: date
+    end_date: date
 
 class PredictionResponse(BaseModel):
+    symbol: str
     prediction: float

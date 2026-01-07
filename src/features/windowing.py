@@ -6,3 +6,4 @@ def create_sequences(data, window_size: int):
         X.append(data[i - window_size:i])
         y.append(data[i])
     return np.array(X), np.array(y)
+

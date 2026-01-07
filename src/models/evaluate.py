@@ -18,7 +18,7 @@ def evaluate():
     split = int(len(X) * 0.8)
     X_test, y_test = X[split:], y[split:]
 
-    model = load_model(MODELS_DIR / "lstm_close_price.h5")
+    model = load_model(MODELS_DIR / "lstm_close_price.keras")
     preds = model.predict(X_test)
 
     mae = mean_absolute_error(y_test, preds)

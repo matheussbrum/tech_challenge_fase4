@@ -25,10 +25,10 @@ def train():
     model.fit(
         X_train, y_train,
         validation_split=0.2,
-        epochs=50,
+        epochs=40,
         batch_size=32,
         callbacks=[early_stop]
     )
 
-    model.save(MODELS_DIR / "lstm_close_price.h5")
+    model.save(MODELS_DIR / "lstm_close_price.keras")
     logger.info("Model trained and saved")

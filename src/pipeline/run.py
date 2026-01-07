@@ -32,7 +32,7 @@ def run_pipeline():
 
         # 5. Final Validation
         logger.info("STEP 5: Artifact Validation")
-        model_path = MODELS_DIR / "lstm_close_price.h5"
+        model_path = MODELS_DIR / "lstm_close_price.keras"
         scaler_path = MODELS_DIR / "scaler.pkl"
 
         if not model_path.exists():
