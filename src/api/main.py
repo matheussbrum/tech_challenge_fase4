@@ -5,6 +5,7 @@ import numpy as np
 import yfinance as yf
 import joblib
 from tensorflow.keras.models import load_model
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from src.utils.config import MODEL_PATH, SCALER_PATH, WINDOW_SIZE
 
@@ -16,6 +17,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    should_ignore_untemplated=True,
+    should_instrument_requests_inprogress=True,
+    excluded_handlers=[".*admin.*", "/metrics"],
+    env_var_name="ENABLE_METRICS",
+    inprogress_name="inprogress",
+    inprogress_labels=True,
+)
+
+instrumentator.instrument(app).expose(app)
 
 class PredictionRequest(BaseModel):
     symbol: str = Field(..., example="MSFT")
@@ -38,6 +50,8 @@ class PredictionResponse(BaseModel):
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(req: PredictionRequest):
+    if model is None or scaler is None:
+        raise HTTPException(status_code=500, detail="Modelo não carregado no servidor.")
 
     # Validação de consistência com o treino
     if req.window_size != WINDOW_SIZE:
